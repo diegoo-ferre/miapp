@@ -182,11 +182,15 @@
         try {
             Class.forName("org.postgresql.Driver");
 
-            String url = "jdbc:postgresql://127.0.0.1:5432/biometrico";
-            String usuario = "postgres";
-            String clave = "1234";
+            String host = System.getenv("DB_HOST");
+            String port = System.getenv("DB_PORT");
+            String db = System.getenv("DB_NAME");
+            String user = System.getenv("DB_USER");
+            String pass = System.getenv("DB_PASSWORD");
 
-            con = DriverManager.getConnection(url, usuario, clave);
+String url = "jdbc:postgresql://" + host + ":" + port + "/" + db;
+
+con = DriverManager.getConnection(url, user, pass);
 
             ps = con.prepareStatement(
                 "INSERT INTO personas(nombre, ci, foto1, foto2, foto3, foto4, foto5) VALUES (?, ?, ?, ?, ?, ?, ?)"

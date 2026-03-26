@@ -104,32 +104,52 @@
 
 <%
     String mensaje = null;
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    Statement st = null;
+Connection con = null;
+PreparedStatement ps = null;
+ResultSet rs = null;
+Statement st = null;
 
-    try {
-        Class.forName("org.postgresql.Driver");
-        con = DriverManager.getConnection(
-            "jdbc:postgresql://127.0.0.1:5432/biometrico",
-            "postgres",
-            "1234"
-        );
+try {
+    Class.forName("org.postgresql.Driver");
 
-        if ("POST".equalsIgnoreCase(request.getMethod())) {
-            String idEliminar = request.getParameter("idEliminar");
+    String host = System.getenv("DB_HOST");
+    String port = System.getenv("DB_PORT");
+    String db = System.getenv("DB_NAME");
+    String user = System.getenv("DB_USER");
+    String pass = System.getenv("DB_PASSWORD");
 
-            if (idEliminar != null && !idEliminar.trim().equals("")) {
-                ps = con.prepareStatement("DELETE FROM personas WHERE id = ?");
-                ps.setInt(1, Integer.parseInt(idEliminar));
-                ps.executeUpdate();
-                ps.close();
-                mensaje = "Registro eliminado correctamente.";
-            }
+    String url = "jdbc:postgresql://" + host + ":" + port + "/" + db;
+
+    con = DriverManager.getConnection(url, user, pass);
+
+    if ("POST".equalsIgnoreCase(request.getMethod())) {
+        String idEliminar = request.getParameter("idEliminar");
+
+        if (idEliminar != null && !idEliminar.trim().equals("")) {
+            ps = con.prepareStatement("delete from personas where id = ?");
+            ps.setInt(1, Integer.parseInt(idEliminar));
+            ps.executeUpdate();
+            ps.close();
+            mensaje = "registro eliminado correctamente.";
         }
+    }
 
-        if (mensaje != null) {
+    st = con.createStatement();
+    rs = st.executeQuery("select * from personas order by id desc");
+    
+} catch (Exception e) {
+    out.println("Error: " + e.getMessage());
+} finally {
+    try {
+        if (rs != null) rs.close();
+        if (st != null) st.close();
+        if (ps != null) ps.close();
+        if (con != null) con.close();
+    } catch (Exception e) {
+        out.println("Error al cerrar: " + e.getMessage());
+    }
+}
+
 %>
             <div class="alert alert-success mensaje"><%= mensaje %></div>
 <%
