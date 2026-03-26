@@ -238,7 +238,7 @@ con = DriverManager.getConnection(url, user, pass);
             <div class="alert alert-danger"><%= error %></div>
         <% } %>
 
-        <form method="post">
+        <form method="post" onsubmit="return validarFormulario();">
             <div class="form-group text-left">
                 <label for="nombre">Nombre completo</label>
                 <input type="text" class="form-control" id="nombre" name="nombre"
@@ -335,6 +335,75 @@ function capturarFoto() {
     contadorFotos.textContent = "Fotos capturadas: " + contador + " / 5";
 }
 </script>
+<script>
+document.getElementById("nombre").addEventListener("input", function () {
+    this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ ]/g, '');
+});
 
+document.getElementById("ci").addEventListener("input", function () {
+    this.value = this.value.replace(/[^0-9]/g, '');
+});
+
+let streamActual = null;
+let contador = 0;
+
+function iniciarCamara() {
+    const video = document.getElementById("video");
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(stream) {
+            streamActual = stream;
+            video.srcObject = stream;
+        })
+        .catch(function(error) {
+            alert("No se pudo acceder a la cámara: " + error);
+        });
+}
+
+function capturarFoto() {
+    if (contador >= 5) {
+        alert("Ya capturaste las 5 fotos.");
+        return;
+    }
+
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const galeria = document.getElementById("galeriaFotos");
+    const contadorFotos = document.getElementById("contadorFotos");
+
+    const contexto = canvas.getContext("2d");
+    contexto.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const imagenData = canvas.toDataURL("image/png");
+    contador++;
+
+    document.getElementById("foto" + contador).value = imagenData;
+
+    const img = document.createElement("img");
+    img.src = imagenData;
+    galeria.appendChild(img);
+
+    contadorFotos.textContent = "Fotos capturadas: " + contador + " / 5";
+}
+
+function validarFormulario() {
+    const nombre = document.getElementById("nombre").value.trim();
+    const ci = document.getElementById("ci").value.trim();
+
+    if (nombre === "" || ci === "") {
+        alert("Completá nombre y CI.");
+        return false;
+    }
+
+    for (let i = 1; i <= 5; i++) {
+        if (document.getElementById("foto" + i).value.trim() === "") {
+            alert("Debés capturar las 5 fotos antes de registrar.");
+            return false;
+        }
+    }
+
+    return true;
+}
+</script>
 </body>
 </html>
