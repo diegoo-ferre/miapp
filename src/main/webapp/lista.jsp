@@ -1,9 +1,11 @@
-<%@ page import="java.sql.*, java.text.SimpleDateFormat" %>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+<%@ page import="java.text.SimpleDateFormat" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Personas</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
 
@@ -27,73 +29,81 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.9);
             width: 98%;
             max-width: 1300px;
-            text-align: center;
         }
 
         h2 {
-            margin-bottom: 20px;
+            text-align: center;
+            font-size: 40px;
             font-weight: bold;
+            margin-bottom: 30px;
         }
 
         table {
             width: 100%;
-            border-radius: 10px;
+            color: white;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
             overflow: hidden;
         }
 
-        th {
-            background: #0b1f2a;
-            color: white;
-            padding: 12px;
+        th, td {
+            padding: 14px;
             text-align: center;
-        }
-
-        td {
-            background: rgba(255,255,255,0.05);
-            padding: 10px;
-            color: #d0d8df;
-            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
             vertical-align: middle;
         }
 
+        th {
+            background: rgba(255,255,255,0.08);
+            font-size: 16px;
+        }
+
         tr:hover td {
-            background: rgba(0, 198, 255, 0.1);
+            background: rgba(255,255,255,0.04);
         }
 
-        .btn-custom {
-            border-radius: 30px;
-            padding: 10px 25px;
-            font-weight: bold;
-            border: none;
-        }
-
-        .btn-volver {
-            background: linear-gradient(45deg, #28a745, #5eff8a);
-            color: white;
-            margin-top: 20px;
-        }
-
-        .btn-eliminar {
-            background: linear-gradient(45deg, #dc3545, #ff6b81);
-            color: white;
-            padding: 8px 18px;
+        .foto-mini {
+            width: 90px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.08);
+            margin: 3px;
         }
 
         .acciones-form {
             margin: 0;
         }
 
+        .btn-eliminar {
+            border-radius: 20px;
+            padding: 8px 18px;
+            font-weight: bold;
+        }
+
+        .btn-volver {
+            display: inline-block;
+            margin-top: 25px;
+            border-radius: 25px;
+            padding: 12px 26px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
         .mensaje {
             margin-bottom: 20px;
         }
 
-        .foto-mini {
-            width: 80px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.15);
-            margin: 2px;
+        .sin-registros {
+            text-align: center;
+            padding: 20px;
+            color: #d0d8df;
+        }
+
+        .boton-centro {
+            text-align: center;
         }
     </style>
 </head>
@@ -103,7 +113,7 @@
     <h2>Personas Registradas</h2>
 
 <%
-    String mensaje = null;
+String mensaje = null;
 Connection con = null;
 PreparedStatement ps = null;
 ResultSet rs = null;
@@ -136,82 +146,85 @@ try {
 
     st = con.createStatement();
     rs = st.executeQuery("select * from personas order by id desc");
-    
-} catch (Exception e) {
-    out.println("Error: " + e.getMessage());
-} finally {
-    try {
-        if (rs != null) rs.close();
-        if (st != null) st.close();
-        if (ps != null) ps.close();
-        if (con != null) con.close();
-    } catch (Exception e) {
-        out.println("Error al cerrar: " + e.getMessage());
-    }
-}
 
+    if (mensaje != null) {
 %>
-            <div class="alert alert-success mensaje"><%= mensaje %></div>
+        <div class="alert alert-success mensaje"><%= mensaje %></div>
 <%
-        }
+    }
 %>
 
     <table>
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>CI</th>
-            <th>Fecha de registro</th>
-            <th>Fotos</th>
-            <th>Acción</th>
-        </tr>
-
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>nombre</th>
+                <th>ci</th>
+                <th>fecha y hora</th>
+                <th>fotos</th>
+                <th>acción</th>
+            </tr>
+        </thead>
+        <tbody>
 <%
-        st = con.createStatement();
-        rs = st.executeQuery("SELECT * FROM personas ORDER BY id DESC");
+    boolean hayRegistros = false;
+    SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-        while(rs.next()){
-            Timestamp fecha = rs.getTimestamp("fecha_registro");
-            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    while (rs.next()) {
+        hayRegistros = true;
+        Timestamp fecha = rs.getTimestamp("fecha_registro");
 %>
-        <tr>
-            <td><%= rs.getInt("id") %></td>
-            <td><%= rs.getString("nombre") %></td>
-            <td><%= rs.getString("ci") %></td>
-            <td><%= fecha != null ? formato.format(fecha) : "" %></td>
-            <td>
-                <% for (int i = 1; i <= 5; i++) {
-                    String foto = rs.getString("foto" + i);
-                    if (foto != null && !foto.trim().equals("")) { %>
-                        <img src="<%= foto %>" class="foto-mini">
-                <% } } %>
-            </td>
-            <td>
-                <form method="post" class="acciones-form" onsubmit="return confirm('Â¿Seguro que querÃ©s eliminar este registro?');">
-                    <input type="hidden" name="idEliminar" value="<%= rs.getInt("id") %>">
-                    <button type="submit" class="btn btn-eliminar btn-custom">Eliminar</button>
-                </form>
-            </td>
-        </tr>
+            <tr>
+                <td><%= rs.getInt("id") %></td>
+                <td><%= rs.getString("nombre") %></td>
+                <td><%= rs.getString("ci") %></td>
+                <td><%= fecha != null ? formato.format(fecha) : "" %></td>
+                <td>
+                    <% if (rs.getString("foto1") != null) { %><img src="<%= rs.getString("foto1") %>" class="foto-mini"><% } %>
+                    <% if (rs.getString("foto2") != null) { %><img src="<%= rs.getString("foto2") %>" class="foto-mini"><% } %>
+                    <% if (rs.getString("foto3") != null) { %><img src="<%= rs.getString("foto3") %>" class="foto-mini"><% } %>
+                    <% if (rs.getString("foto4") != null) { %><img src="<%= rs.getString("foto4") %>" class="foto-mini"><% } %>
+                    <% if (rs.getString("foto5") != null) { %><img src="<%= rs.getString("foto5") %>" class="foto-mini"><% } %>
+                </td>
+                <td>
+                    <form method="post" class="acciones-form">
+                        <input type="hidden" name="idEliminar" value="<%= rs.getInt("id") %>">
+                        <button type="submit" class="btn btn-danger btn-eliminar">eliminar</button>
+                    </form>
+                </td>
+            </tr>
 <%
-        }
+    }
 
-    } catch(Exception e){
+    if (!hayRegistros) {
+%>
+            <tr>
+                <td colspan="6" class="sin-registros">no hay registros guardados.</td>
+            </tr>
+<%
+    }
+%>
+        </tbody>
+    </table>
+
+<%
+} catch (Exception e) {
 %>
     <div class="alert alert-danger mensaje">
         Error: <%= e.getMessage() %>
     </div>
 <%
-    } finally {
-        try { if (rs != null) rs.close(); } catch(Exception e) {}
-        try { if (st != null) st.close(); } catch(Exception e) {}
-        try { if (ps != null) ps.close(); } catch(Exception e) {}
-        try { if (con != null) con.close(); } catch(Exception e) {}
-    }
+} finally {
+    try { if (rs != null) rs.close(); } catch (Exception e) {}
+    try { if (st != null) st.close(); } catch (Exception e) {}
+    try { if (ps != null) ps.close(); } catch (Exception e) {}
+    try { if (con != null) con.close(); } catch (Exception e) {}
+}
 %>
-    </table>
 
-    <a href="index.jsp" class="btn btn-volver btn-custom">Volver al inicio</a>
+    <div class="boton-centro">
+        <a href="index.jsp" class="btn btn-success btn-volver">Volver al inicio</a>
+    </div>
 </div>
 
 </body>
