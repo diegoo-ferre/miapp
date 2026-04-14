@@ -1,12 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
-<%@ page import="java.text.SimpleDateFormat" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Personas</title>
+    <title>Gestión de Salarios</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
 
     <style>
@@ -28,7 +27,7 @@
             color: white;
             box-shadow: 0 10px 40px rgba(0,0,0,0.9);
             width: 98%;
-            max-width: 1300px;
+            max-width: 1200px;
         }
 
         h2 {
@@ -64,20 +63,7 @@
             background: rgba(255,255,255,0.04);
         }
 
-        .foto-mini {
-            width: 90px;
-            height: 70px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.08);
-            margin: 3px;
-        }
-
-        .acciones-form {
-            margin: 0;
-        }
-
-        .btn-eliminar {
+        .btn-asignar {
             border-radius: 20px;
             padding: 8px 18px;
             font-weight: bold;
@@ -90,6 +76,16 @@
             padding: 12px 26px;
             font-size: 16px;
             font-weight: bold;
+        }
+
+        .btn-ver {
+            display: inline-block;
+            margin-top: 25px;
+            border-radius: 25px;
+            padding: 12px 26px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-right: 10px;
         }
 
         .mensaje {
@@ -110,14 +106,12 @@
 <body>
 
 <div class="contenedor">
-    <h2>Personas Registradas</h2>
+    <h2>Gestión de Salarios</h2>
 
 <%
-String mensaje = null;
 Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
 Statement st = null;
+ResultSet rs = null;
 
 try {
     Class.forName("org.postgresql.Driver");
@@ -127,27 +121,8 @@ try {
     String pass = "kV68XNGBKHeMYUF8hX0fpS2hUueDUI0p";
 
     con = DriverManager.getConnection(url, user, pass);
-
-    if ("POST".equalsIgnoreCase(request.getMethod())) {
-        String idEliminar = request.getParameter("idEliminar");
-
-        if (idEliminar != null && !idEliminar.trim().equals("")) {
-            ps = con.prepareStatement("delete from personas where id = ?");
-            ps.setInt(1, Integer.parseInt(idEliminar));
-            ps.executeUpdate();
-            ps.close();
-            mensaje = "registro eliminado correctamente.";
-        }
-    }
-
     st = con.createStatement();
-    rs = st.executeQuery("select * from personas order by id desc");
-
-    if (mensaje != null) {
-%>
-        <div class="alert alert-success mensaje"><%= mensaje %></div>
-<%
-    }
+    rs = st.executeQuery("select id, nombre, ci from personas order by id desc");
 %>
 
     <table>
@@ -156,37 +131,24 @@ try {
                 <th>id</th>
                 <th>nombre</th>
                 <th>ci</th>
-                <th>fecha y hora</th>
-                <th>fotos</th>
                 <th>acción</th>
             </tr>
         </thead>
         <tbody>
 <%
     boolean hayRegistros = false;
-    SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     while (rs.next()) {
         hayRegistros = true;
-        Timestamp fecha = rs.getTimestamp("fecha_registro");
 %>
             <tr>
                 <td><%= rs.getInt("id") %></td>
                 <td><%= rs.getString("nombre") %></td>
                 <td><%= rs.getString("ci") %></td>
-                <td><%= fecha != null ? formato.format(fecha) : "" %></td>
                 <td>
-                    <% if (rs.getString("foto1") != null) { %><img src="<%= rs.getString("foto1") %>" class="foto-mini"><% } %>
-                    <% if (rs.getString("foto2") != null) { %><img src="<%= rs.getString("foto2") %>" class="foto-mini"><% } %>
-                    <% if (rs.getString("foto3") != null) { %><img src="<%= rs.getString("foto3") %>" class="foto-mini"><% } %>
-                    <% if (rs.getString("foto4") != null) { %><img src="<%= rs.getString("foto4") %>" class="foto-mini"><% } %>
-                    <% if (rs.getString("foto5") != null) { %><img src="<%= rs.getString("foto5") %>" class="foto-mini"><% } %>
-                </td>
-                <td>
-                    <form method="post" class="acciones-form">
-                        <input type="hidden" name="idEliminar" value="<%= rs.getInt("id") %>">
-                        <button type="submit" class="btn btn-danger btn-eliminar">eliminar</button>
-                    </form>
+                    <a href="editar_salario.jsp?id=<%= rs.getInt("id") %>" class="btn btn-warning btn-asignar">
+                        asignar sueldo
+                    </a>
                 </td>
             </tr>
 <%
@@ -195,7 +157,7 @@ try {
     if (!hayRegistros) {
 %>
             <tr>
-                <td colspan="6" class="sin-registros">no hay registros guardados.</td>
+                <td colspan="4" class="sin-registros">no hay personas registradas.</td>
             </tr>
 <%
     }
@@ -213,12 +175,12 @@ try {
 } finally {
     try { if (rs != null) rs.close(); } catch (Exception e) {}
     try { if (st != null) st.close(); } catch (Exception e) {}
-    try { if (ps != null) ps.close(); } catch (Exception e) {}
     try { if (con != null) con.close(); } catch (Exception e) {}
 }
 %>
 
     <div class="boton-centro">
+        <a href="ver_salarios.jsp" class="btn btn-info btn-ver">Ver salarios</a>
         <a href="index.jsp" class="btn btn-success btn-volver">Volver al inicio</a>
     </div>
 </div>

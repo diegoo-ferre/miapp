@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-String autenticado = (String) session.getAttribute("autenticado");
-if (autenticado == null || !autenticado.equals("si")) {
+if (session.getAttribute("usuario") == null) {
     response.sendRedirect("login.jsp");
     return;
 }
@@ -27,71 +26,66 @@ if (autenticado == null || !autenticado.equals("si")) {
         }
 
         .contenedor {
-            background: rgba(10, 15, 25, 0.85);
-            border: 1px solid rgba(255,255,255,0.08);
-            backdrop-filter: blur(15px);
-            border-radius: 25px;
+            background: rgba(10, 15, 25, 0.88);
             padding: 45px 35px;
+            border-radius: 30px;
             text-align: center;
             color: white;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.9);
-            max-width: 520px;
             width: 100%;
+            max-width: 700px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9);
         }
 
         .logo {
             width: 120px;
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 20px rgba(255,255,255,0.6));
-            animation: flotar 3s ease-in-out infinite;
-        }
-
-        @keyframes flotar {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-            100% { transform: translateY(0px); }
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 20px;
         }
 
         h1 {
-            font-size: 40px;
+            font-size: 48px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         p {
-            font-size: 18px;
-            color: #d0d8df;
-            margin-bottom: 30px;
+            font-size: 20px;
+            color: #dce6ef;
+            margin-bottom: 35px;
         }
 
         .btn-custom {
             display: block;
             width: 100%;
-            margin: 12px 0;
-            border-radius: 30px;
-            padding: 14px;
-            font-size: 18px;
-            font-weight: 600;
-            transition: 0.3s;
-            text-decoration: none;
-            color: white;
+            max-width: 360px;
+            margin: 12px auto;
+            padding: 14px 20px;
             border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s ease;
         }
 
         .btn-custom:hover {
-            transform: translateY(-2px);
-            text-decoration: none;
+            transform: scale(1.03);
             color: white;
+            text-decoration: none;
         }
 
         .btn-registro {
-            background: linear-gradient(45deg, #007bff, #00c6ff);
+            background: linear-gradient(45deg, #00b09b, #96c93d);
         }
 
         .btn-lista {
-            background: linear-gradient(45deg, #28a745, #5eff8a);
+            background: linear-gradient(45deg, #2193b0, #6dd5ed);
+        }
+
+        .btn-salarios {
+            background: linear-gradient(45deg, #f39c12, #f1c40f);
         }
 
         .btn-cerrar {
@@ -100,6 +94,7 @@ if (autenticado == null || !autenticado.equals("si")) {
     </style>
 </head>
 <body>
+
     <div class="contenedor">
         <img src="img/loogoproyecto.png" class="logo" alt="Logo">
         <h1>Bienvenido</h1>
@@ -107,7 +102,9 @@ if (autenticado == null || !autenticado.equals("si")) {
 
         <a href="registro.jsp" class="btn-custom btn-registro">Registrar persona</a>
         <a href="lista.jsp" class="btn-custom btn-lista">Ver registros</a>
+        <a href="salarios.jsp" class="btn-custom btn-salarios">Gestión de salarios</a>
         <a href="logout.jsp" class="btn-custom btn-cerrar">Cerrar sesión</a>
     </div>
+
 </body>
 </html>

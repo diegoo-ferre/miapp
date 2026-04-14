@@ -122,13 +122,9 @@ Statement st = null;
 try {
     Class.forName("org.postgresql.Driver");
 
-    String host = System.getenv("DB_HOST");
-    String port = System.getenv("DB_PORT");
-    String db = System.getenv("DB_NAME");
-    String user = System.getenv("DB_USER");
-    String pass = System.getenv("DB_PASSWORD");
-
-    String url = "jdbc:postgresql://" + host + ":" + port + "/" + db;
+    String url = "jdbc:postgresql://dpg-d722t9p4tr6s739f73ag-a.oregon-postgres.render.com:5432/biometrico_ytr7";
+    String user = "biometrico_ytr7_user";
+    String pass = "kV68XNGBKHeMYUF8hX0fpS2hUueDUI0p";
 
     con = DriverManager.getConnection(url, user, pass);
 
