@@ -9,6 +9,98 @@ if (session.getAttribute("usuario") == null) {
 }
 %>
 
+<%
+String mensaje = null;
+String tipoMensaje = "success";
+
+String nombreValor = "";
+String ciValor = "";
+
+Connection con = null;
+PreparedStatement ps = null;
+
+if ("POST".equalsIgnoreCase(request.getMethod())) {
+    request.setCharacterEncoding("UTF-8");
+
+    String nombre = request.getParameter("nombre");
+    String ci = request.getParameter("ci");
+    String foto1 = request.getParameter("foto1");
+    String foto2 = request.getParameter("foto2");
+    String foto3 = request.getParameter("foto3");
+    String foto4 = request.getParameter("foto4");
+    String foto5 = request.getParameter("foto5");
+
+    if (nombre == null) nombre = "";
+    if (ci == null) ci = "";
+    if (foto1 == null) foto1 = "";
+    if (foto2 == null) foto2 = "";
+    if (foto3 == null) foto3 = "";
+    if (foto4 == null) foto4 = "";
+    if (foto5 == null) foto5 = "";
+
+    nombre = nombre.trim();
+    ci = ci.trim();
+
+    nombreValor = nombre;
+    ciValor = ci;
+
+    boolean nombreValido = Pattern.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$", nombre);
+    boolean ciValido = Pattern.matches("^[0-9]+$", ci);
+
+    if (nombre.equals("")) {
+        mensaje = "debe completar el nombre.";
+        tipoMensaje = "danger";
+    } else if (ci.equals("")) {
+        mensaje = "debe completar la cédula.";
+        tipoMensaje = "danger";
+    } else if (!nombreValido) {
+        mensaje = "el nombre solo debe contener letras.";
+        tipoMensaje = "danger";
+    } else if (!ciValido) {
+        mensaje = "la cédula solo debe contener números.";
+        tipoMensaje = "danger";
+    } else if (foto1.equals("") || foto2.equals("") || foto3.equals("") || foto4.equals("") || foto5.equals("")) {
+        mensaje = "debe capturar las 5 fotos obligatorias.";
+        tipoMensaje = "danger";
+    } else {
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            String url = "jdbc:postgresql://dpg-d722t9p4tr6s739f73ag-a.oregon-postgres.render.com:5432/biometrico_ytr7";
+            String user = "biometrico_ytr7_user";
+            String pass = "PON_AQUI_TU_PASSWORD_REAL";
+
+            con = DriverManager.getConnection(url, user, pass);
+
+            ps = con.prepareStatement(
+                "insert into personas (nombre, ci, foto1, foto2, foto3, foto4, foto5) values (?, ?, ?, ?, ?, ?, ?)"
+            );
+            ps.setString(1, nombre);
+            ps.setString(2, ci);
+            ps.setString(3, foto1);
+            ps.setString(4, foto2);
+            ps.setString(5, foto3);
+            ps.setString(6, foto4);
+            ps.setString(7, foto5);
+
+            ps.executeUpdate();
+
+            mensaje = "persona registrada correctamente.";
+            tipoMensaje = "success";
+
+            nombreValor = "";
+            ciValor = "";
+        } catch (Exception e) {
+            mensaje = "error: " + e.getMessage();
+            tipoMensaje = "danger";
+        } finally {
+            try { if (ps != null) ps.close(); } catch (Exception e) {}
+            try { if (con != null) con.close(); } catch (Exception e) {}
+        }
+    }
+}
+%>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -138,6 +230,10 @@ if (session.getAttribute("usuario") == null) {
             text-align: center;
             margin-top: 20px;
         }
+
+        canvas {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -145,106 +241,24 @@ if (session.getAttribute("usuario") == null) {
 <div class="contenedor">
     <h2>Registro de Personas</h2>
 
-<%
-String mensaje = null;
-String tipoMensaje = "success";
-
-Connection con = null;
-PreparedStatement ps = null;
-
-if ("POST".equalsIgnoreCase(request.getMethod())) {
-    request.setCharacterEncoding("UTF-8");
-
-    String nombre = request.getParameter("nombre");
-    String ci = request.getParameter("ci");
-    String foto1 = request.getParameter("foto1");
-    String foto2 = request.getParameter("foto2");
-    String foto3 = request.getParameter("foto3");
-    String foto4 = request.getParameter("foto4");
-    String foto5 = request.getParameter("foto5");
-
-    if (nombre == null) nombre = "";
-    if (ci == null) ci = "";
-    if (foto1 == null) foto1 = "";
-    if (foto2 == null) foto2 = "";
-    if (foto3 == null) foto3 = "";
-    if (foto4 == null) foto4 = "";
-    if (foto5 == null) foto5 = "";
-
-    nombre = nombre.trim();
-    ci = ci.trim();
-
-    boolean nombreValido = Pattern.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$", nombre);
-    boolean ciValido = Pattern.matches("^[0-9]+$", ci);
-
-    if (nombre.equals("") || ci.equals("")) {
-        mensaje = "todos los campos son obligatorios.";
-        tipoMensaje = "danger";
-    } else if (!nombreValido) {
-        mensaje = "el nombre solo debe contener letras.";
-        tipoMensaje = "danger";
-    } else if (!ciValido) {
-        mensaje = "la cédula solo debe contener números.";
-        tipoMensaje = "danger";
-    } else if (foto1.equals("") || foto2.equals("") || foto3.equals("") || foto4.equals("") || foto5.equals("")) {
-        mensaje = "debe capturar las 5 fotos obligatorias.";
-        tipoMensaje = "danger";
-    } else {
-        try {
-            Class.forName("org.postgresql.Driver");
-
-            String url = "jdbc:postgresql://dpg-d722t9p4tr6s739f73ag-a.oregon-postgres.render.com:5432/biometrico_ytr7";
-            String user = "biometrico_ytr7_user";
-            String pass = "kV68XNGBKHeMYUF8hX0fpS2hUueDUI0p";
-
-            con = DriverManager.getConnection(url, user, pass);
-
-            ps = con.prepareStatement(
-                "insert into personas (nombre, ci, foto1, foto2, foto3, foto4, foto5) values (?, ?, ?, ?, ?, ?, ?)"
-            );
-            ps.setString(1, nombre);
-            ps.setString(2, ci);
-            ps.setString(3, foto1);
-            ps.setString(4, foto2);
-            ps.setString(5, foto3);
-            ps.setString(6, foto4);
-            ps.setString(7, foto5);
-
-            ps.executeUpdate();
-
-            mensaje = "persona registrada correctamente.";
-            tipoMensaje = "success";
-        } catch (Exception e) {
-            mensaje = "error: " + e.getMessage();
-            tipoMensaje = "danger";
-        } finally {
-            try { if (ps != null) ps.close(); } catch (Exception e) {}
-            try { if (con != null) con.close(); } catch (Exception e) {}
-        }
-    }
-}
-
-if (mensaje != null) {
-%>
+<% if (mensaje != null) { %>
     <div class="alert alert-<%= tipoMensaje %> mensaje"><%= mensaje %></div>
-<%
-}
-%>
+<% } %>
 
-    <form method="post" id="formRegistro" onsubmit="return validarFormulario();">
+    <form method="post" action="registro.jsp" id="formRegistro">
         <div class="form-group">
             <label for="nombre">Nombre completo</label>
-            <input type="text" name="nombre" id="nombre" class="form-control" maxlength="100" required>
+            <input type="text" name="nombre" id="nombre" class="form-control" maxlength="100" value="<%= nombreValor %>" required>
         </div>
 
         <div class="form-group">
             <label for="ci">Cédula de identidad</label>
-            <input type="text" name="ci" id="ci" class="form-control" maxlength="20" required>
+            <input type="text" name="ci" id="ci" class="form-control" maxlength="20" value="<%= ciValor %>" required>
         </div>
 
         <div class="bloque-video">
-            <video id="video" autoplay playsinline></video>
-            <canvas id="canvas" style="display:none;"></canvas>
+            <video id="video" autoplay playsinline muted></video>
+            <canvas id="canvas"></canvas>
         </div>
 
         <div class="contador">
@@ -253,7 +267,7 @@ if (mensaje != null) {
 
         <div class="acciones">
             <button type="button" class="btn-custom btn-captura" onclick="capturarFoto()">Capturar foto</button>
-            <button type="submit" class="btn-custom btn-guardar">Guardar registro</button>
+            <button type="button" class="btn-custom btn-guardar" onclick="guardarRegistro()">Guardar registro</button>
         </div>
 
         <input type="hidden" name="foto1" id="foto1">
@@ -275,6 +289,7 @@ if (mensaje != null) {
     const canvas = document.getElementById("canvas");
     const previewBox = document.getElementById("previewBox");
     const contador = document.getElementById("contador");
+    const formRegistro = document.getElementById("formRegistro");
 
     let fotosCapturadas = 0;
 
@@ -300,7 +315,6 @@ if (mensaje != null) {
         const imagenBase64 = canvas.toDataURL("image/png");
 
         fotosCapturadas++;
-
         document.getElementById("foto" + fotosCapturadas).value = imagenBase64;
         contador.innerText = fotosCapturadas;
 
@@ -309,34 +323,43 @@ if (mensaje != null) {
         previewBox.appendChild(img);
     }
 
-    function validarFormulario() {
+    function guardarRegistro() {
         const nombre = document.getElementById("nombre").value.trim();
         const ci = document.getElementById("ci").value.trim();
 
         const regexNombre = /^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/;
         const regexCi = /^[0-9]+$/;
 
-        if (nombre === "" || ci === "") {
-            alert("todos los campos son obligatorios.");
-            return false;
+        if (nombre === "") {
+            alert("debe completar el nombre.");
+            return;
+        }
+
+        if (ci === "") {
+            alert("debe completar la cédula.");
+            return;
         }
 
         if (!regexNombre.test(nombre)) {
             alert("el nombre solo debe contener letras.");
-            return false;
+            return;
         }
 
         if (!regexCi.test(ci)) {
             alert("la cédula solo debe contener números.");
-            return false;
+            return;
         }
 
-        if (fotosCapturadas < 5) {
+        if (document.getElementById("foto1").value === "" ||
+            document.getElementById("foto2").value === "" ||
+            document.getElementById("foto3").value === "" ||
+            document.getElementById("foto4").value === "" ||
+            document.getElementById("foto5").value === "") {
             alert("debe capturar las 5 fotos obligatorias.");
-            return false;
+            return;
         }
 
-        return true;
+        formRegistro.submit();
     }
 </script>
 
