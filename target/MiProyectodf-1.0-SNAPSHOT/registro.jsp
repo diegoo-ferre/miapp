@@ -24,7 +24,7 @@ if ("POST".equalsIgnoreCase(request.getMethod())) {
         try {
             Class.forName("org.postgresql.Driver");
             Connection conn = DriverManager.getConnection(
-                "jdbc:postgresql://jdbc:postgresql://dpg-d722t9p4tr6s739f73ag-a.oregon-postgres.render.com:5432/biometrico_ytr7",
+                "jdbc:postgresql://dpg-d722t9p4tr6s739f73ag-a.oregon-postgres.render.com:5432/biometrico_ytr7",
                 "biometrico_ytr7_user",
                 "kV68XNGBKHeMYUF8hX0fpS2hUueDUI0p"
             );
