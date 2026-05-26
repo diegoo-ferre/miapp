@@ -1,28 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 <%
-String mensaje = null;
-
-if ("POST".equalsIgnoreCase(request.getMethod())) {
-    String clave = request.getParameter("clave");
-
-    if (clave != null && clave.equals("tesis2026")) {
-        session.setAttribute("usuario", "admin");
-        response.sendRedirect("index.jsp");
-        return;
-    } else {
-        mensaje = "contraseña incorrecta.";
-    }
-}
+String error = request.getParameter("error");
 %>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login del Sistema</title>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
 
     <style>
+
         body {
             margin: 0;
             min-height: 100vh;
@@ -69,6 +61,7 @@ if ("POST".equalsIgnoreCase(request.getMethod())) {
             padding: 14px;
             font-size: 16px;
             margin-bottom: 20px;
+            border: none;
         }
 
         .btn-ingresar {
@@ -90,27 +83,58 @@ if ("POST".equalsIgnoreCase(request.getMethod())) {
         .mensaje {
             margin-bottom: 20px;
         }
+
     </style>
+
 </head>
 <body>
 
 <div class="contenedor">
+
     <img src="img/loogoproyecto.png" class="logo" alt="Logo">
+
     <h2>Iniciar sesión</h2>
-    <p>Ingrese la contraseña para acceder al sistema biométrico.</p>
 
-<%
-if (mensaje != null) {
-%>
-    <div class="alert alert-danger mensaje"><%= mensaje %></div>
-<%
-}
-%>
+    <p>
+        Acceda al sistema biométrico empresarial.
+    </p>
 
-    <form method="post">
-        <input type="password" name="clave" class="form-control" placeholder="Ingrese la contraseña" required>
-        <button type="submit" class="btn-ingresar">Ingresar</button>
+    <%
+    if (error != null) {
+    %>
+
+        <div class="alert alert-danger mensaje">
+            Usuario o contraseña incorrectos.
+        </div>
+
+    <%
+    }
+    %>
+
+    <form action="${pageContext.request.contextPath}/LoginServlet" method="post">
+
+        <input 
+            type="text"
+            name="usuario"
+            class="form-control"
+            placeholder="Ingrese su usuario"
+            required
+        >
+
+        <input 
+            type="password"
+            name="password"
+            class="form-control"
+            placeholder="Ingrese su contraseña"
+            required
+        >
+
+        <button type="submit" class="btn-ingresar">
+            Ingresar
+        </button>
+
     </form>
+
 </div>
 
 </body>

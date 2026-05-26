@@ -89,6 +89,7 @@ try {
         <div class="alert alert-danger resultado">el porcentaje debe estar entre 0 y 100.</div>
 <%
         } else {
+
             if (motivo == null) {
                 motivo = "";
             }
@@ -98,20 +99,22 @@ try {
         <div class="alert alert-danger resultado">debe escribir el motivo del descuento.</div>
 <%
             } else {
+
                 double montoDescuento = sueldoBase * porcentaje / 100.0;
                 double sueldoFinal = sueldoBase - montoDescuento;
 
                 Class.forName("org.postgresql.Driver");
 
-                String url = "jdbc:postgresql://dpg-d722t9p4tr6s739f73ag-a.oregon-postgres.render.com:5432/biometrico_ytr7";
-                String user = "biometrico_ytr7_user";
-                String pass = "kV68XNGBKHeMYUF8hX0fpS2hUueDUI0p";
+                String url = "jdbc:postgresql://ep-ancient-haze-aca057wp-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require";
+                String user = "neondb_owner";
+                String pass = "npg_6rt8OdayAHcm";
 
                 con = DriverManager.getConnection(url, user, pass);
 
                 ps = con.prepareStatement(
                     "update salarios set sueldo_base = ?, porcentaje_descuento = ?, motivo_descuento = ?, monto_descuento = ?, sueldo_final = ? where id = ?"
                 );
+
                 ps.setDouble(1, sueldoBase);
                 ps.setDouble(2, porcentaje);
                 ps.setString(3, motivo);
@@ -130,6 +133,7 @@ try {
             }
         }
     }
+
 } catch (Exception e) {
 %>
     <div class="alert alert-danger resultado">

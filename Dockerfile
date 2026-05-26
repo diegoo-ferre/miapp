@@ -1,12 +1,7 @@
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+FROM tomcat:10.1
 
-WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
+COPY target/*.war /usr/local/tomcat/webapps/ROOT.war
 
-FROM tomcat:10.1-jdk21
+EXPOSE 8080
 
-RUN rm -rf /usr/local/tomcat/webapps/*
-COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
-
-CMD sh -c "sed -i \"s/port=\\\"8080\\\"/port=\\\"${PORT:-10000}\\\"/\" /usr/local/tomcat/conf/server.xml && catalina.sh run"
+CMD ["catalina.sh", "run"]

@@ -116,11 +116,11 @@ ResultSet rs = null;
 try {
     Class.forName("org.postgresql.Driver");
 
-    String url = "jdbc:postgresql://dpg-d722t9p4tr6s739f73ag-a.oregon-postgres.render.com:5432/biometrico_ytr7";
-    String user = "biometrico_ytr7_user";
-    String pass = "kV68XNGBKHeMYUF8hX0fpS2hUueDUI0p";
+    String url = "jdbc:postgresql://ep-ancient-haze-aca057wp-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require";
+                String user = "neondb_owner";
+                String pass = "npg_6rt8OdayAHcm";
 
-    con = DriverManager.getConnection(url, user, pass);
+                con = DriverManager.getConnection(url, user, pass);
     st = con.createStatement();
     rs = st.executeQuery("select id, nombre, ci from personas order by id desc");
 %>
