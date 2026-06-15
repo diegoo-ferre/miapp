@@ -190,7 +190,7 @@ try {
 %>
 
     <div class="botones">
-        <a href="index.jsp" class="btn-custom btn-volver">Volver al inicio</a>
+        <a href="admin.jsp" class="btn-custom btn-volver">Volver al inicio</a>
         <a href="salario_base.jsp" class="btn-custom btn-salarios">Sueldos base</a>
         <a href="lista.jsp" class="btn-custom btn-registros">Registros</a>
         <a href="ver_accesos.jsp" class="btn-custom btn-asistencias">Ver accesos</a>

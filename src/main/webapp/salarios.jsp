@@ -6,9 +6,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Salarios</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
 
     <style>
+
         body {
             margin: 0;
             min-height: 100vh;
@@ -101,11 +104,14 @@
         .boton-centro {
             text-align: center;
         }
+
     </style>
 </head>
+
 <body>
 
 <div class="contenedor">
+
     <h2>Gestión de Salarios</h2>
 
 <%
@@ -114,75 +120,177 @@ Statement st = null;
 ResultSet rs = null;
 
 try {
+
     Class.forName("org.postgresql.Driver");
 
-    String url = "jdbc:postgresql://ep-ancient-haze-aca057wp-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require";
-                String user = "neondb_owner";
-                String pass = "npg_6rt8OdayAHcm";
+    String url =
+        "jdbc:postgresql://ep-ancient-haze-aca057wp-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require";
 
-                con = DriverManager.getConnection(url, user, pass);
+    String user = "neondb_owner";
+
+    String pass = "npg_6rt8OdayAHcm";
+
+    con = DriverManager.getConnection(url, user, pass);
+
     st = con.createStatement();
-    rs = st.executeQuery("select id, nombre, ci from personas order by id desc");
+
+    rs = st.executeQuery(
+        "SELECT p.id, p.nombre, p.ci, s.sueldo_final " +
+        "FROM personas p " +
+        "LEFT JOIN salarios s ON p.id = s.persona_id " +
+        "ORDER BY p.id DESC"
+    );
 %>
 
     <table>
+
         <thead>
+
             <tr>
-                <th>id</th>
-                <th>nombre</th>
-                <th>ci</th>
-                <th>acción</th>
+
+                <th>ID</th>
+
+                <th>Nombre</th>
+
+                <th>CI</th>
+
+                <th>Sueldo</th>
+
+                <th>Acción</th>
+
             </tr>
+
         </thead>
+
         <tbody>
+
 <%
     boolean hayRegistros = false;
 
     while (rs.next()) {
+
         hayRegistros = true;
 %>
+
             <tr>
-                <td><%= rs.getInt("id") %></td>
-                <td><%= rs.getString("nombre") %></td>
-                <td><%= rs.getString("ci") %></td>
+
                 <td>
-                    <a href="editar_salario.jsp?id=<%= rs.getInt("id") %>" class="btn btn-warning btn-asignar">
-                        asignar sueldo
-                    </a>
+                    <%= rs.getInt("id") %>
                 </td>
+
+                <td>
+                    <%= rs.getString("nombre") %>
+                </td>
+
+                <td>
+                    <%= rs.getString("ci") %>
+                </td>
+
+                <td>
+
+<%
+    double sueldo = rs.getDouble("sueldo_final");
+
+    if (rs.wasNull()) {
+%>
+
+                    Sin asignar
+
+<%
+    } else {
+%>
+
+                    Gs. <%= String.format("%,.0f", sueldo) %>
+
+<%
+    }
+%>
+
+                </td>
+
+                <td>
+
+                    <a href="editar_salario.jsp?id=<%= rs.getInt("id") %>"
+                       class="btn btn-warning btn-asignar">
+
+                        Editar
+
+                    </a>
+
+                </td>
+
             </tr>
+
 <%
     }
 
     if (!hayRegistros) {
 %>
+
             <tr>
-                <td colspan="4" class="sin-registros">no hay personas registradas.</td>
+
+                <td colspan="5"
+                    class="sin-registros">
+
+                    no hay personas registradas.
+
+                </td>
+
             </tr>
+
 <%
     }
 %>
+
         </tbody>
+
     </table>
 
 <%
 } catch (Exception e) {
 %>
+
     <div class="alert alert-danger mensaje">
+
         Error: <%= e.getMessage() %>
+
     </div>
+
 <%
 } finally {
-    try { if (rs != null) rs.close(); } catch (Exception e) {}
-    try { if (st != null) st.close(); } catch (Exception e) {}
-    try { if (con != null) con.close(); } catch (Exception e) {}
+
+    try {
+        if (rs != null) rs.close();
+    } catch (Exception e) {}
+
+    try {
+        if (st != null) st.close();
+    } catch (Exception e) {}
+
+    try {
+        if (con != null) con.close();
+    } catch (Exception e) {}
 }
 %>
 
     <div class="boton-centro">
-        <a href="ver_salarios.jsp" class="btn btn-info btn-ver">Ver salarios</a>
-        <a href="index.jsp" class="btn btn-success btn-volver">Volver al inicio</a>
+
+        <a href="ver_salarios.jsp"
+           class="btn btn-info btn-ver">
+
+            Ver salarios
+
+        </a>
+
+        <a href="admin.jsp"
+           class="btn btn-success btn-volver">
+
+            Volver al inicio
+
+        </a>
+
     </div>
+
 </div>
 
 </body>

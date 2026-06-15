@@ -485,7 +485,7 @@ try {
 </div>
 
     <div class="boton-centro">
-        <a href="index.jsp" class="btn-volver">Volver al inicio</a>
+        <a href="admin.jsp" class="btn-volver">Volver al inicio</a>
     </div>
 </div>
 

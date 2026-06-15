@@ -264,7 +264,7 @@ try {
 %>
 
     <div class="text-center mt-4">
-        <a href="index.jsp" class="btn-custom btn-volver">Volver al inicio</a>
+        <a href="admin.jsp" class="btn-custom btn-volver">Volver al inicio</a>
     </div>
 </div>
 

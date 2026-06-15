@@ -6,9 +6,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guardar Sueldo</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
 
     <style>
+
         body {
             margin: 0;
             min-height: 100vh;
@@ -50,99 +53,181 @@
             font-size: 18px;
             margin-top: 20px;
         }
+
     </style>
 </head>
+
 <body>
 
 <div class="contenedor">
+
     <h2>Resultado del Registro</h2>
 
 <%
+
 Connection con = null;
 PreparedStatement ps = null;
+PreparedStatement verificar = null;
+ResultSet rsVerificar = null;
 
 try {
+
     request.setCharacterEncoding("UTF-8");
 
-    String personaIdStr = request.getParameter("persona_id");
-    String sueldoBaseStr = request.getParameter("sueldo_base");
-    String porcentajeStr = request.getParameter("porcentaje_descuento");
-    String motivo = request.getParameter("motivo_descuento");
+    String personaIdStr =
+        request.getParameter("persona_id");
 
-    if (personaIdStr == null || personaIdStr.trim().equals("") ||
-        sueldoBaseStr == null || sueldoBaseStr.trim().equals("") ||
-        porcentajeStr == null || porcentajeStr.trim().equals("")) {
+    String sueldoBaseStr =
+        request.getParameter("sueldo_base");
+
+    if (personaIdStr == null ||
+        personaIdStr.trim().equals("") ||
+
+        sueldoBaseStr == null ||
+        sueldoBaseStr.trim().equals("")) {
 %>
-        <div class="alert alert-danger resultado">faltan datos obligatorios.</div>
+
+        <div class="alert alert-danger resultado">
+
+            faltan datos obligatorios.
+
+        </div>
+
 <%
     } else {
-        int personaId = Integer.parseInt(personaIdStr);
-        double sueldoBase = Double.parseDouble(sueldoBaseStr);
-        double porcentaje = Double.parseDouble(porcentajeStr);
+
+        int personaId =
+            Integer.parseInt(personaIdStr);
+
+        double sueldoBase =
+            Double.parseDouble(sueldoBaseStr);
 
         if (sueldoBase < 0) {
 %>
-        <div class="alert alert-danger resultado">el sueldo base no puede ser menor a 0.</div>
-<%
-        } else if (porcentaje < 0 || porcentaje > 100) {
-%>
-        <div class="alert alert-danger resultado">el porcentaje debe estar entre 0 y 100.</div>
+
+        <div class="alert alert-danger resultado">
+
+            el sueldo no puede ser menor a 0.
+
+        </div>
+
 <%
         } else {
-            if (motivo == null) {
-                motivo = "";
-            }
 
-            if (porcentaje > 0 && motivo.trim().equals("")) {
-%>
-        <div class="alert alert-danger resultado">debe escribir el motivo del descuento.</div>
-<%
-            } else {
-                double montoDescuento = sueldoBase * porcentaje / 100.0;
-                double sueldoFinal = sueldoBase - montoDescuento;
+            Class.forName("org.postgresql.Driver");
 
-                Class.forName("org.postgresql.Driver");
+            String url =
+                "jdbc:postgresql://ep-ancient-haze-aca057wp-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require";
 
-                String url = "jdbc:postgresql://ep-ancient-haze-aca057wp-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require";
-                String user = "neondb_owner";
-                String pass = "npg_6rt8OdayAHcm";
+            String user =
+                "neondb_owner";
 
-                con = DriverManager.getConnection(url, user, pass);
+            String pass =
+                "npg_6rt8OdayAHcm";
+
+            con = DriverManager.getConnection(
+                url,
+                user,
+                pass
+            );
+
+            verificar = con.prepareStatement(
+                "SELECT id FROM salarios WHERE persona_id = ?"
+            );
+
+            verificar.setInt(1, personaId);
+
+            rsVerificar = verificar.executeQuery();
+
+            // =========================
+            // SI YA EXISTE -> UPDATE
+            // =========================
+            if (rsVerificar.next()) {
 
                 ps = con.prepareStatement(
-                    "insert into salarios (persona_id, sueldo_base, porcentaje_descuento, motivo_descuento, monto_descuento, sueldo_final) values (?, ?, ?, ?, ?, ?)"
+                    "UPDATE salarios " +
+                    "SET sueldo_base = ?, sueldo_final = ? " +
+                    "WHERE persona_id = ?"
                 );
+
+                ps.setDouble(1, sueldoBase);
+                ps.setDouble(2, sueldoBase);
+                ps.setInt(3, personaId);
+
+            }
+
+            // =========================
+            // SI NO EXISTE -> INSERT
+            // =========================
+            else {
+
+                ps = con.prepareStatement(
+                    "INSERT INTO salarios(" +
+                    "persona_id, sueldo_base, sueldo_final" +
+                    ") VALUES (?, ?, ?)"
+                );
+
                 ps.setInt(1, personaId);
                 ps.setDouble(2, sueldoBase);
-                ps.setDouble(3, porcentaje);
-                ps.setString(4, motivo);
-                ps.setDouble(5, montoDescuento);
-                ps.setDouble(6, sueldoFinal);
+                ps.setDouble(3, sueldoBase);
 
-                ps.executeUpdate();
-%>
-        <div class="alert alert-success resultado">
-            sueldo guardado correctamente.<br><br>
-            <strong>monto descontado:</strong> <%= montoDescuento %><br>
-            <strong>sueldo final:</strong> <%= sueldoFinal %>
-        </div>
-<%
             }
+
+            ps.executeUpdate();
+%>
+
+        <div class="alert alert-success resultado">
+
+            sueldo guardado correctamente.<br><br>
+
+            <strong>Sueldo:</strong>
+
+            Gs.
+            <%= String.format("%,.0f", sueldoBase) %>
+
+        </div>
+
+<%
         }
     }
+
 } catch (Exception e) {
 %>
+
     <div class="alert alert-danger resultado">
+
         Error: <%= e.getMessage() %>
+
     </div>
+
 <%
 } finally {
-    try { if (ps != null) ps.close(); } catch (Exception e) {}
-    try { if (con != null) con.close(); } catch (Exception e) {}
+
+    try {
+        if (rsVerificar != null) rsVerificar.close();
+    } catch (Exception e) {}
+
+    try {
+        if (verificar != null) verificar.close();
+    } catch (Exception e) {}
+
+    try {
+        if (ps != null) ps.close();
+    } catch (Exception e) {}
+
+    try {
+        if (con != null) con.close();
+    } catch (Exception e) {}
 }
 %>
 
-    <a href="salarios.jsp" class="btn btn-success btn-volver">Volver a salarios</a>
+    <a href="salarios.jsp"
+       class="btn btn-success btn-volver">
+
+        Volver a salarios
+
+    </a>
+
 </div>
 
 </body>

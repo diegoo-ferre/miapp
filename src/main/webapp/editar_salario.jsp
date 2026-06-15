@@ -115,35 +115,54 @@ try {
 %>
 
     <form method="post" action="guardar_salario.jsp">
-        <input type="hidden" name="persona_id" value="<%= idPersona %>">
 
-        <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" class="form-control" value="<%= nombre %>" readonly>
-        </div>
+    <input type="hidden"
+           name="persona_id"
+           value="<%= idPersona %>">
 
-        <div class="form-group">
-            <label>CI</label>
-            <input type="text" class="form-control" value="<%= ci %>" readonly>
-        </div>
+    <div class="form-group">
 
-        <div class="form-group">
-            <label>Sueldo base</label>
-            <input type="number" step="0.01" min="0" name="sueldo_base" class="form-control" required>
-        </div>
+        <label>Nombre</label>
 
-        <div class="form-group">
-            <label>Porcentaje de descuento</label>
-            <input type="number" step="0.01" min="0" max="100" name="porcentaje_descuento" class="form-control" required>
-        </div>
+        <input type="text"
+               class="form-control"
+               value="<%= nombre %>"
+               readonly>
 
-        <div class="form-group">
-            <label>Motivo del descuento</label>
-            <input type="text" name="motivo_descuento" class="form-control" maxlength="255">
-        </div>
+    </div>
 
-        <button type="submit" class="btn btn-warning btn-guardar">Guardar sueldo</button>
-    </form>
+    <div class="form-group">
+
+        <label>CI</label>
+
+        <input type="text"
+               class="form-control"
+               value="<%= ci %>"
+               readonly>
+
+    </div>
+
+    <div class="form-group">
+
+        <label>Sueldo base</label>
+
+        <input type="number"
+               step="0.01"
+               name="sueldo_base"
+               class="form-control"
+               value="<%= sueldoBase %>"
+               required>
+
+    </div>
+
+    <button type="submit"
+            class="btn btn-warning btn-guardar">
+
+        Guardar sueldo
+
+    </button>
+
+</form>
 
     <div class="boton-centro">
         <a href="salarios.jsp" class="btn btn-success btn-volver">Volver</a>

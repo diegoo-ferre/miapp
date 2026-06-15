@@ -218,7 +218,7 @@ try {
 %>
 
     <div class="boton-centro">
-        <a href="index.jsp" class="btn btn-success btn-volver">Volver al inicio</a>
+        <a href="admin.jsp" class="btn btn-success btn-volver">Volver al inicio</a>
     </div>
 </div>
 
